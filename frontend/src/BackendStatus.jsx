@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import API_URL from "./config";
 
@@ -15,8 +14,8 @@ function BackendStatus() {
         return response.json();
       })
       .then((data) => {
-        setStatus(data.status);
-        setServer(data.server);
+        setStatus(data.status || "Online");
+        setServer(data.server || "CloudNova");
       })
       .catch(() => {
         setStatus("Offline");
@@ -24,11 +23,20 @@ function BackendStatus() {
       });
   }, []);
 
+  const isOnline = status === "Online";
+  const isChecking = status === "Checking...";
+
   return (
-    <div>
-      <h3>Backend Connection</h3>
-      <p>Server: {server || "CloudNova"}</p>
-      <p>Status: {status}</p>
+    <div
+      className="backend-status-pill"
+      title={`Server: ${server || "CloudNova"} (${API_URL})`}
+    >
+      <span
+        className={`status-dot ${
+          isOnline ? "online" : isChecking ? "checking" : "offline"
+        }`}
+      />
+      <span className="status-label">API: {status}</span>
     </div>
   );
 }

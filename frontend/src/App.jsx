@@ -306,8 +306,6 @@ function App() {
 
   return (
     <div className="dashboard">
-      <BackendStatus />
-
       <aside className="sidebar">
         <h2 className="logo">☁ CloudNova</h2>
 
@@ -347,8 +345,11 @@ function App() {
             </p>
           </div>
 
-          <div className="profile">
-            👤 {user.name || "User"}
+          <div className="topbar-right">
+            <BackendStatus />
+            <div className="profile">
+              👤 {user.name || "User"}
+            </div>
           </div>
         </header>
 
