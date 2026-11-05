@@ -4,6 +4,14 @@ CloudNova is a full-stack cloud management dashboard built using React, FastAPI,
 
 ---
 
+## 🌐 Live Deployments
+
+- **Frontend Application (Vercel)**: [https://cloud-nova-five.vercel.app/](https://cloud-nova-five.vercel.app/)
+- **Backend API (Render)**: [https://cloudnova-api.onrender.com](https://cloudnova-api.onrender.com)
+- **API Documentation (Swagger UI)**: [https://cloudnova-api.onrender.com/docs](https://cloudnova-api.onrender.com/docs)
+
+---
+
 ## 🚀 Features
 
 - **Authentication System**: User Signup, Login, and secure session management via JWT (JSON Web Tokens) with rate limiting and password hashing (Scrypt).

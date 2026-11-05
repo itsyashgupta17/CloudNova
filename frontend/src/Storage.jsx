@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "./config";
 
 function Storage() {
   const [buckets, setBuckets] = useState([]);
@@ -7,7 +8,7 @@ function Storage() {
   const [size, setSize] = useState("");
   const [message, setMessage] = useState("");
 
-  const API = "http://127.0.0.1:8000";
+  const API = API_BASE_URL;
 
   // Get the logged-in user's token.
   const getAuthHeaders = () => {

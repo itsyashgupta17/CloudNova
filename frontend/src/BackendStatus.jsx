@@ -1,12 +1,13 @@
 
 import { useEffect, useState } from "react";
+import API_URL from "./config";
 
 function BackendStatus() {
   const [status, setStatus] = useState("Checking...");
   const [server, setServer] = useState("");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/status")
+    fetch(`${API_URL}/status`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Backend request failed");

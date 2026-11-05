@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import API_URL from "./config";
 import "./Auth.css";
 
 function Signup({ onSwitch, onSignupSuccess }) {
@@ -21,7 +22,7 @@ function Signup({ onSwitch, onSignupSuccess }) {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/signup", {
+      const response = await fetch(`${API_URL}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

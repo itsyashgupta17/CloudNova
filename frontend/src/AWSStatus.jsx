@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import API_URL from "./config";
 
 function AWSStatus() {
   const [status, setStatus] = useState(null);
@@ -11,7 +12,7 @@ function AWSStatus() {
       try {
         const token = localStorage.getItem("cloudnova_token");
 
-        const response = await fetch("http://127.0.0.1:8000/aws/status", {
+        const response = await fetch(`${API_URL}/aws/status`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

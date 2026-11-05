@@ -9,9 +9,8 @@ import Billing from "./Billing";
 import Login from "./Login";
 import Signup from "./Signup";
 import AWSStatus from "./AWSStatus";
+import API_URL from "./config";
 import "./App.css";
-
-const API_URL = "http://127.0.0.1:8000";
 
 const menuItems = [
   { name: "Overview", icon: "▦" },
