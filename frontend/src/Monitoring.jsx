@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 const Monitoring = () => {
@@ -31,7 +30,7 @@ const Monitoring = () => {
   ];
 
   const container = {
-    padding: "30px",
+    padding: "clamp(16px, 3vw, 30px)",
     color: "#e2e8f0",
   };
 
@@ -39,29 +38,29 @@ const Monitoring = () => {
     background: "#1e293b",
     border: "1px solid #334155",
     borderRadius: "14px",
-    padding: "22px",
+    padding: "clamp(16px, 2.5vw, 22px)",
   };
 
   return (
     <div style={container}>
-      <h1 style={{ fontSize: "28px", marginBottom: "8px" }}>
+      <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", marginBottom: "8px" }}>
         Monitoring
       </h1>
 
-      <p style={{ color: "#94a3b8", marginBottom: "28px" }}>
+      <p style={{ color: "#94a3b8", marginBottom: "24px" }}>
         Monitor your CloudNova resource performance.
       </p>
 
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
         gap: "18px",
       }}>
         {cards.map((card) => (
           <div key={card.name} style={cardStyle}>
-            <p style={{ color: "#94a3b8", margin: 0 }}>{card.name}</p>
+            <p style={{ color: "#94a3b8", margin: 0, fontSize: "14px" }}>{card.name}</p>
 
-            <h2 style={{ fontSize: "30px", margin: "15px 0" }}>
+            <h2 style={{ fontSize: "clamp(24px, 3.5vw, 30px)", margin: "14px 0" }}>
               {card.value}{card.unit}
             </h2>
 
@@ -89,11 +88,11 @@ const Monitoring = () => {
         ...cardStyle,
         marginTop: "25px",
       }}>
-        <h3>System Health</h3>
-        <p style={{ color: "#10b981" }}>
+        <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>System Health</h3>
+        <p style={{ color: "#10b981", margin: "8px 0", fontWeight: "600" }}>
           ● All demo monitoring indicators are operational
         </p>
-        <p style={{ color: "#94a3b8", fontSize: "13px" }}>
+        <p style={{ color: "#94a3b8", fontSize: "13px", margin: 0, lineHeight: 1.5 }}>
           Metrics refresh every 3 seconds. These are simulated values,
           not measurements from a real server.
         </p>

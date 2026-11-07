@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "./config";
 
@@ -114,55 +113,34 @@ function Storage() {
   };
 
   return (
-    <div style={{ padding: "20px", color: "white" }}>
-      <h1>Storage Management</h1>
-      <p>Create and manage your cloud storage buckets.</p>
+    <div className="storage-container">
+      <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", marginBottom: "8px" }}>
+        Storage Management
+      </h1>
+      <p style={{ color: "#94a3b8", marginBottom: "20px" }}>
+        Create and manage your cloud storage buckets.
+      </p>
 
       {/* Storage Statistics */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: "15px",
-          margin: "25px 0",
-        }}
-      >
-        <div
-          style={{
-            background: "#252b3b",
-            padding: "20px",
-            borderRadius: "10px",
-          }}
-        >
+      <div className="storage-stats-grid">
+        <div className="storage-stat-card">
           <p>Total Buckets</p>
           <h1>{buckets.length}</h1>
         </div>
 
-        <div
-          style={{
-            background: "#252b3b",
-            padding: "20px",
-            borderRadius: "10px",
-          }}
-        >
+        <div className="storage-stat-card">
           <p>Total Storage Capacity</p>
           <h1>{totalStorage} GB</h1>
         </div>
 
-        <div
-          style={{
-            background: "#252b3b",
-            padding: "20px",
-            borderRadius: "10px",
-          }}
-        >
+        <div className="storage-stat-card">
           <p>Average Bucket Size</p>
           <h1>{averageStorage} GB</h1>
         </div>
       </div>
 
       {/* Create Bucket Form */}
-      <form onSubmit={createBucket}>
+      <form onSubmit={createBucket} className="storage-form-card">
         <input
           placeholder="Bucket name"
           value={name}
@@ -179,30 +157,35 @@ function Storage() {
           required
         />
 
-        <button type="submit">Create Bucket</button>
+        <button type="submit" className="create-btn">
+          Create Bucket
+        </button>
       </form>
 
-      {message && <p>{message}</p>}
+      {message && (
+        <p style={{ color: "#38bdf8", marginBottom: "16px" }}>
+          {message}
+        </p>
+      )}
 
-      <h2>Your Storage Buckets</h2>
+      <h2 style={{ fontSize: "clamp(18px, 2.5vw, 22px)", margin: "24px 0 14px" }}>
+        Your Storage Buckets
+      </h2>
 
       {buckets.length === 0 ? (
-        <p>No storage buckets found.</p>
+        <p style={{ color: "#94a3b8" }}>No storage buckets found.</p>
       ) : (
         buckets.map((bucket) => (
-          <div
-            key={bucket.id}
-            style={{
-              padding: "15px",
-              margin: "10px 0",
-              background: "#252b3b",
-              borderRadius: "8px",
-            }}
-          >
-            <strong>{bucket.name}</strong>
-            <p>Capacity: {bucket.size_gb} GB</p>
+          <div key={bucket.id} className="storage-bucket-item">
+            <div className="storage-bucket-info">
+              <strong>{bucket.name}</strong>
+              <p>Capacity: {bucket.size_gb} GB</p>
+            </div>
 
-            <button onClick={() => deleteBucket(bucket.id)}>
+            <button
+              className="delete-btn"
+              onClick={() => deleteBucket(bucket.id)}
+            >
               Delete
             </button>
           </div>

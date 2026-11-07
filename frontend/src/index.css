@@ -1,23 +1,26 @@
-
 :root {
-  font-family: Arial, sans-serif;
+  font-family: Arial, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #172033;
   background: #f4f6fb;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
 html, body, #root {
   margin: 0;
+  padding: 0;
   width: 100%;
   min-width: 320px;
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
 }

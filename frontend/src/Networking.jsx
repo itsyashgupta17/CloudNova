@@ -1,6 +1,4 @@
-
 import { useEffect, useState } from "react";
-
 import API_URL from "./config";
 
 export default function Networking() {
@@ -162,37 +160,48 @@ export default function Networking() {
   ).length;
 
   return (
-    <div style={{ padding: "24px", color: "#fff" }}>
-      <h1>Networking Management</h1>
+    <div style={{ padding: "clamp(16px, 3vw, 24px)", color: "#fff" }}>
+      <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", marginBottom: "8px" }}>
+        Networking Management
+      </h1>
 
-      <p style={{ color: "#94a3b8" }}>
+      <p style={{ color: "#94a3b8", marginBottom: "20px" }}>
         Manage your virtual networks and IP address ranges.
       </p>
 
       {/* Network Statistics */}
       <div style={statsGridStyle}>
         <div style={cardStyle}>
-          <h3>Total Networks</h3>
-          <h2>{networks.length}</h2>
+          <h3 style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "8px" }}>Total Networks</h3>
+          <h2 style={{ fontSize: "clamp(24px, 3.5vw, 32px)", color: "#60a5fa", margin: 0 }}>{networks.length}</h2>
         </div>
 
         <div style={cardStyle}>
-          <h3>Active Networks</h3>
-          <h2>{activeCount}</h2>
+          <h3 style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "8px" }}>Active Networks</h3>
+          <h2 style={{ fontSize: "clamp(24px, 3.5vw, 32px)", color: "#4ade80", margin: 0 }}>{activeCount}</h2>
         </div>
 
         <div style={cardStyle}>
-          <h3>Inactive Networks</h3>
-          <h2>{inactiveCount}</h2>
+          <h3 style={{ fontSize: "14px", color: "#94a3b8", marginBottom: "8px" }}>Inactive Networks</h3>
+          <h2 style={{ fontSize: "clamp(24px, 3.5vw, 32px)", color: "#f87171", margin: 0 }}>{inactiveCount}</h2>
         </div>
       </div>
 
       {/* Create Network Form */}
       <form
         onSubmit={createNetwork}
-        style={{ ...cardStyle, marginBottom: "24px" }}
+        style={{
+          ...cardStyle,
+          marginBottom: "24px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "12px",
+          alignItems: "center",
+        }}
       >
-        <h2>Create Virtual Network</h2>
+        <div style={{ width: "100%", marginBottom: "4px" }}>
+          <h2 style={{ fontSize: "clamp(18px, 2.5vw, 20px)", margin: 0 }}>Create Virtual Network</h2>
+        </div>
 
         <input
           value={name}
@@ -225,8 +234,9 @@ export default function Networking() {
 
         <button
           type="submit"
-          style={buttonStyle}
+          className="create-btn"
           disabled={submitting}
+          style={{ minHeight: "44px" }}
         >
           {submitting ? "Creating..." : "+ Create Network"}
         </button>
@@ -241,19 +251,19 @@ export default function Networking() {
 
       {/* Network List */}
       <div style={cardStyle}>
-        <h2>Your Networks</h2>
+        <h2 style={{ fontSize: "clamp(18px, 2.5vw, 22px)", marginBottom: "16px" }}>Your Networks</h2>
 
         {loading ? (
-          <p>Loading networks...</p>
+          <p style={{ color: "#94a3b8" }}>Loading networks...</p>
         ) : networks.length === 0 ? (
-          <p>No networks created yet.</p>
+          <p style={{ color: "#94a3b8" }}>No networks created yet.</p>
         ) : (
           networks.map((network) => (
             <div key={network.id} style={networkRowStyle}>
               <div>
-                <strong>{network.name}</strong>
+                <strong style={{ fontSize: "16px", color: "#f1f5f9" }}>{network.name}</strong>
 
-                <p style={{ color: "#94a3b8" }}>
+                <p style={{ color: "#94a3b8", fontSize: "13px", margin: "4px 0" }}>
                   {network.cidr} · {network.region}
                 </p>
 
@@ -261,17 +271,19 @@ export default function Networking() {
                   style={{
                     color:
                       network.status === "Active"
-                        ? "#22c55e"
+                        ? "#4ade80"
                         : "#f87171",
+                    fontWeight: "600",
+                    fontSize: "13px",
                   }}
                 >
-                  {network.status}
+                  ● {network.status}
                 </span>
               </div>
 
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <button
-                  style={buttonStyle}
+                  className="action-btn"
                   onClick={() => toggleNetwork(network)}
                 >
                   {network.status === "Active"
@@ -280,7 +292,7 @@ export default function Networking() {
                 </button>
 
                 <button
-                  style={deleteStyle}
+                  className="delete-btn"
                   onClick={() => deleteNetwork(network.id)}
                 >
                   Delete
@@ -301,33 +313,28 @@ export default function Networking() {
 
 const cardStyle = {
   background: "#1e293b",
-  padding: "20px",
+  padding: "clamp(16px, 2.5vw, 22px)",
   borderRadius: "12px",
+  border: "1px solid #334155",
 };
 
 const statsGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))",
   gap: "16px",
   margin: "24px 0",
 };
 
 const inputStyle = {
-  padding: "12px",
-  margin: "8px 8px 8px 0",
-  borderRadius: "6px",
-};
-
-const buttonStyle = {
-  padding: "10px 16px",
-  cursor: "pointer",
-};
-
-const deleteStyle = {
-  ...buttonStyle,
-  background: "#dc2626",
+  padding: "12px 14px",
+  flex: "1 1 180px",
+  minWidth: "150px",
+  background: "#0f172a",
   color: "#fff",
-  border: "none",
+  border: "1px solid #334155",
+  borderRadius: "8px",
+  fontSize: "16px",
+  boxSizing: "border-box",
 };
 
 const networkRowStyle = {

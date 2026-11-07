@@ -25,6 +25,7 @@ const menuItems = [
 function App() {
   const [activePage, setActivePage] = useState("Overview");
   const [authPage, setAuthPage] = useState("login");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [token, setToken] = useState(
     () => localStorage.getItem("cloudnova_token")
@@ -32,6 +33,17 @@ function App() {
 
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  // Close sidebar on Escape key
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const [vms, setVms] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -306,8 +318,27 @@ function App() {
 
   return (
     <div className="dashboard">
-      <aside className="sidebar">
-        <h2 className="logo">☁ CloudNova</h2>
+      {/* Mobile backdrop overlay */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+        <div className="sidebar-header">
+          <h2 className="logo">☁ CloudNova</h2>
+          <button
+            type="button"
+            className="sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation menu"
+          >
+            ✕
+          </button>
+        </div>
 
         <p className="menu-title">MAIN MENU</p>
 
@@ -318,7 +349,10 @@ function App() {
               className={
                 activePage === item.name ? "active" : ""
               }
-              onClick={() => setActivePage(item.name)}
+              onClick={() => {
+                setActivePage(item.name);
+                setSidebarOpen(false);
+              }}
             >
               <span>{item.icon}</span>
               {item.name}
@@ -327,10 +361,15 @@ function App() {
         </nav>
 
         <div className="sidebar-bottom">
-          <a>⚙ Settings</a>
-          <a>❔ Help & Support</a>
+          <a onClick={() => setSidebarOpen(false)}>⚙ Settings</a>
+          <a onClick={() => setSidebarOpen(false)}>❔ Help & Support</a>
 
-          <button onClick={handleLogout}>
+          <button
+            onClick={() => {
+              setSidebarOpen(false);
+              handleLogout();
+            }}
+          >
             🚪 Logout
           </button>
         </div>
@@ -338,17 +377,29 @@ function App() {
 
       <main className="main-content">
         <header className="topbar">
-          <div>
-            <h2>{activePage}</h2>
-            <p>
-              Welcome back, {user.name || user.email}!
-            </p>
+          <div className="topbar-left">
+            <button
+              type="button"
+              className="mobile-menu-btn"
+              onClick={() => setSidebarOpen((prev) => !prev)}
+              aria-label="Toggle navigation menu"
+            >
+              <span className="hamburger-bar"></span>
+              <span className="hamburger-bar"></span>
+              <span className="hamburger-bar"></span>
+            </button>
+            <div>
+              <h2>{activePage}</h2>
+              <p className="topbar-subtitle">
+                Welcome back, {user.name || user.email}!
+              </p>
+            </div>
           </div>
 
           <div className="topbar-right">
             <BackendStatus />
             <div className="profile">
-              👤 {user.name || "User"}
+              👤 <span className="profile-name">{user.name || "User"}</span>
             </div>
           </div>
         </header>

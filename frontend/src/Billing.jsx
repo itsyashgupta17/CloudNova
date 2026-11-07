@@ -1,4 +1,3 @@
-
 import React from "react";
 
 const Billing = () => {
@@ -17,16 +16,16 @@ const Billing = () => {
     background: "#1e293b",
     border: "1px solid #334155",
     borderRadius: "14px",
-    padding: "22px",
+    padding: "clamp(16px, 2.5vw, 22px)",
   };
 
   return (
-    <div style={{ padding: "30px", color: "#e2e8f0" }}>
-      <h1 style={{ fontSize: "28px", marginBottom: "8px" }}>
+    <div style={{ padding: "clamp(16px, 3vw, 30px)", color: "#e2e8f0" }}>
+      <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", marginBottom: "8px" }}>
         Billing & Usage
       </h1>
 
-      <p style={{ color: "#94a3b8", marginBottom: "28px" }}>
+      <p style={{ color: "#94a3b8", marginBottom: "24px" }}>
         View your estimated CloudNova service costs.
       </p>
 
@@ -35,10 +34,10 @@ const Billing = () => {
         marginBottom: "22px",
         borderColor: "#6366f1",
       }}>
-        <p style={{ color: "#94a3b8", margin: 0 }}>
+        <p style={{ color: "#94a3b8", margin: 0, fontSize: "14px" }}>
           Estimated Monthly Cost
         </p>
-        <h2 style={{ fontSize: "38px", margin: "12px 0" }}>
+        <h2 style={{ fontSize: "clamp(28px, 4vw, 38px)", margin: "12px 0", color: "#60a5fa" }}>
           ₹{total.toLocaleString("en-IN")}
         </h2>
         <p style={{ color: "#94a3b8", fontSize: "13px", margin: 0 }}>
@@ -46,21 +45,21 @@ const Billing = () => {
         </p>
       </div>
 
-      <h2 style={{ fontSize: "20px", marginBottom: "16px" }}>
+      <h2 style={{ fontSize: "clamp(18px, 2.5vw, 20px)", marginBottom: "16px" }}>
         Service Breakdown
       </h2>
 
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
         gap: "18px",
       }}>
         {services.map((service) => (
           <div key={service.name} style={cardStyle}>
-            <p style={{ color: "#94a3b8", margin: 0 }}>
+            <p style={{ color: "#94a3b8", margin: 0, fontSize: "14px" }}>
               {service.name}
             </p>
-            <h2 style={{ fontSize: "27px", margin: "12px 0" }}>
+            <h2 style={{ fontSize: "clamp(22px, 3vw, 27px)", margin: "12px 0" }}>
               ₹{service.amount.toLocaleString("en-IN")}
             </h2>
 
@@ -81,8 +80,8 @@ const Billing = () => {
       </div>
 
       <div style={{ ...cardStyle, marginTop: "25px" }}>
-        <h3>Billing Information</h3>
-        <p style={{ color: "#94a3b8", lineHeight: 1.7 }}>
+        <h3 style={{ fontSize: "18px", marginBottom: "10px" }}>Billing Information</h3>
+        <p style={{ color: "#94a3b8", lineHeight: 1.7, fontSize: "14px", margin: 0 }}>
           Billing period: Current month<br />
           Currency: INR (₹)<br />
           Payment status: Demo mode
