@@ -18,7 +18,7 @@ CloudNova is a full-stack cloud management dashboard built using React, FastAPI,
 - **Dashboard Overview**: Resource overview cards (Virtual Machines, Storage, Databases, Monthly Billing), real-time AWS connection indicator, and system operational statuses.
 - **Compute (Virtual Machines)**: VM management supporting state changes (Running/Stopped), deletion, and EC2 configuration generation.
 - **Storage Management**: Cloud storage bucket creation, capacity tracking, and deletion.
-- **Databases Management**: Multi-engine database provisioning (PostgreSQL, MySQL, MongoDB, SQLite), engine validation, and active/inactive status toggling.
+- **Databases Management**: Dedicated MongoDB database provisioning and live connection management, engine validation, and active/inactive status toggling.
 - **Networking Management**: Virtual Private Cloud (VPC) / Network creation with strict CIDR block validation (e.g., `10.0.0.0/16`), region assignment, and status controls.
 - **Monitoring Dashboard**: Real-time simulated metrics for CPU usage, memory utilization, network traffic, and system uptime.
 - **Billing & Cost Estimation**: Service-by-service cost breakdown and monthly expenditure estimations in INR (₹).
@@ -131,7 +131,7 @@ cd backend
 - `test_api.py`: Root `/` and `/status` endpoints.
 - `test_auth.py`: User registration, duplicate email rejection, password complexity, and JWT authenticated profile fetching (`/me`).
 - `test_storage.py`: Authentication enforcement, bucket creation, list, and deletion.
-- `test_databases.py`: Engine validation (PostgreSQL, MySQL, MongoDB, SQLite), status toggles, and deletion.
+- `test_databases.py`: Dedicated MongoDB engine validation, rejection of non-MongoDB engines (PostgreSQL, MySQL, SQLite), status toggles, deletion, and live MongoDB integration tests.
 - `test_networks.py`: Strict CIDR validation (e.g., rejecting invalid IP masks), network creation, and status management.
 - `test_aws_service.py`: AWS simulation mode, boto3 client error handling, and mock connection testing.
 

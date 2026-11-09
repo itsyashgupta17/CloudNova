@@ -13,7 +13,7 @@
 2. [Service 1: Authentication & Identity Management (IAM)](#2-service-1-authentication--identity-management-iam)
 3. [Service 2: Compute & Virtual Machines (EC2 Engine)](#3-service-2-compute--virtual-machines-ec2-engine)
 4. [Service 3: Cloud Object Storage (Buckets)](#4-service-3-cloud-object-storage-buckets)
-5. [Service 4: Multi-Engine Database Provisioning](#5-service-4-multi-engine-database-provisioning)
+5. [Service 4: MongoDB Database Provisioning](#5-service-4-mongodb-database-provisioning)
 6. [Service 5: VPC Virtual Networking & IP Routing](#6-service-5-vpc-virtual-networking--ip-routing)
 7. [Service 6: Infrastructure Monitoring & Telemetry](#7-service-6-infrastructure-monitoring--telemetry)
 8. [Service 7: FinOps, Billing & Cost Estimation](#8-service-7-finops-billing--cost-estimation)
@@ -130,22 +130,19 @@ Provides scalable, S3-compatible cloud object storage abstractions. Enables user
 
 ---
 
-## 5. Service 4: Multi-Engine Database Provisioning
+## 5. Service 4: MongoDB Database Provisioning
 
 ### 5.1 Description & Purpose
-Allows developers to provision and manage managed database clusters across multiple database engines. Supports both relational (SQL) and non-relational (NoSQL) workloads.
+Allows developers to provision and manage managed database clusters with dedicated MongoDB support, including live connection testing, URI configuration, and cluster synchronization.
 
 ### 5.2 Supported Database Engines
-1. **PostgreSQL**: Advanced open-source object-relational database.
-2. **MySQL**: Widely-used open-source relational SQL database.
-3. **MongoDB**: Document-oriented NoSQL database for unstructured JSON data.
-4. **SQLite**: Self-contained, serverless embedded relational database.
+1. **MongoDB**: Document-oriented NoSQL database for flexible JSON/BSON data models, live cluster synchronization, and real-time operations.
 
 ### 5.3 Specifications & Parameters
 | Field | Type | Validation Rules | Description |
 | :--- | :--- | :--- | :--- |
 | `name` | String | Unique string, 1–100 chars | Database instance name |
-| `engine` | Enum | `PostgreSQL`, `MySQL`, `MongoDB`, `SQLite` | Selected database engine |
+| `engine` | Enum | `MongoDB` | Selected database engine (MongoDB only) |
 | `status` | Enum | `Active`, `Inactive` | Current operational state |
 
 ### 5.4 How to Use
@@ -153,7 +150,7 @@ Allows developers to provision and manage managed database clusters across multi
 2. Review statistics cards: Total, Active, and Inactive databases.
 3. In the form:
    - Enter **Database Name** (e.g., `prod_analytics`).
-   - Select the **Engine** from the dropdown menu.
+   - The database engine is preset to **MongoDB** (exclusive database engine).
    - Click **"Create Database"**.
 4. In the database list:
    - Click **"Deactivate"** to place the database on standby.

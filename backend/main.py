@@ -7,6 +7,7 @@ import time
 import threading
 import ipaddress
 from aws_service import get_ec2_status
+import mongodb_service
 
 from collections import defaultdict, deque
 from pathlib import Path
@@ -375,6 +376,9 @@ def init_db():
                     initial_vms
                 )
 
+        # Remove any legacy non-MongoDB databases so only MongoDB is retained
+        conn.execute("DELETE FROM databases WHERE engine != 'MongoDB'")
+
         conn.commit()
 
     finally:
@@ -438,7 +442,11 @@ class BucketCreate(BaseModel):
 
 class DatabaseCreate(BaseModel):
     name: str = Field(min_length=1, max_length=100)
-    engine: str
+    engine: str = Field(default="MongoDB")
+
+
+class MongoConfig(BaseModel):
+    uri: str = Field(min_length=1)
 
 
 class NetworkCreate(BaseModel):
@@ -777,11 +785,46 @@ def delete_bucket(
 # =====================================
 
 ALLOWED_ENGINES = [
-    "PostgreSQL",
-    "MySQL",
-    "MongoDB",
-    "SQLite"
+    "MongoDB"
 ]
+
+
+@app.get("/databases/mongodb/status")
+def get_mongodb_status(current_user: dict = Depends(get_current_user)):
+    return mongodb_service.test_connection()
+
+
+@app.post("/databases/mongodb/test")
+def test_mongodb_connection(config: MongoConfig, current_user: dict = Depends(get_current_user)):
+    return mongodb_service.test_connection(config.uri)
+
+
+@app.post("/databases/mongodb/config")
+def save_mongodb_config(config: MongoConfig, current_user: dict = Depends(get_current_user)):
+    uri = config.uri.strip()
+    test_res = mongodb_service.test_connection(uri)
+    if not test_res.get("connected"):
+        raise HTTPException(
+            status_code=400,
+            detail=test_res.get("error", "Failed to connect to MongoDB with provided URI")
+        )
+
+    os.environ["MONGODB_URI"] = uri
+
+    env_file = Path(__file__).resolve().parent / ".env"
+    existing_lines = []
+    if env_file.exists():
+        existing_lines = [
+            l for l in env_file.read_text(encoding="utf-8").splitlines()
+            if not l.startswith("MONGODB_URI=")
+        ]
+    existing_lines.append(f'MONGODB_URI="{uri}"')
+    env_file.write_text("\n".join(existing_lines) + "\n", encoding="utf-8")
+
+    return {
+        "message": "MongoDB connection configured and verified successfully!",
+        "status": test_res
+    }
 
 
 @app.get("/databases")
@@ -815,7 +858,10 @@ def create_database(
         raise HTTPException(status_code=400, detail="Database name cannot be empty")
 
     if database.engine not in ALLOWED_ENGINES:
-        raise HTTPException(status_code=400, detail="Unsupported database engine")
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported database engine. Only MongoDB is supported."
+        )
 
     conn = get_connection()
 
@@ -830,12 +876,21 @@ def create_database(
 
         conn.commit()
 
+        mongo_result = {}
+        if database.engine == "MongoDB":
+            mongo_result = mongodb_service.save_database_to_mongodb(name, current_user["id"])
+
+        msg = "Database created successfully"
+        if mongo_result.get("stored_in_mongo"):
+            msg = f"Database created in CloudNova and synchronized to your MongoDB instance ({name})!"
+
         return {
             "id": cursor.lastrowid,
             "name": name,
             "engine": database.engine,
             "status": "Active",
-            "message": "Database created successfully"
+            "message": msg,
+            "mongo": mongo_result
         }
 
     except sqlite3.IntegrityError:
@@ -888,6 +943,17 @@ def delete_database(
     conn = get_connection()
 
     try:
+        db_row = conn.execute(
+            "SELECT name, engine FROM databases WHERE id = ? AND user_id = ?",
+            (database_id, current_user["id"])
+        ).fetchone()
+
+        if not db_row:
+            raise HTTPException(status_code=404, detail="Database not found")
+
+        db_name = db_row["name"]
+        db_engine = db_row["engine"]
+
         cursor = conn.execute(
             """
             DELETE FROM databases
@@ -896,10 +962,11 @@ def delete_database(
             (database_id, current_user["id"])
         )
 
-        if cursor.rowcount == 0:
-            raise HTTPException(status_code=404, detail="Database not found")
-
         conn.commit()
+
+        if db_engine == "MongoDB":
+            mongodb_service.delete_database_from_mongodb(db_name, current_user["id"])
+
         return {"message": "Database deleted successfully"}
 
     finally:

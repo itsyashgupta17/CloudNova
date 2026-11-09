@@ -4,9 +4,17 @@ import API_URL from "./config";
 export default function Databases() {
   const [databases, setDatabases] = useState([]);
   const [name, setName] = useState("");
-  const [engine, setEngine] = useState("PostgreSQL");
+  const [engine] = useState("MongoDB");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  // MongoDB Connection State
+  const [mongoStatus, setMongoStatus] = useState(null);
+  const [mongoUri, setMongoUri] = useState("");
+  const [testingMongo, setTestingMongo] = useState(false);
+  const [savingMongo, setSavingMongo] = useState(false);
+  const [mongoFeedback, setMongoFeedback] = useState(null);
+  const [showConfig, setShowConfig] = useState(false);
 
   // Get login token.
   const getAuthHeaders = () => {
@@ -15,6 +23,92 @@ export default function Databases() {
     return {
       Authorization: `Bearer ${token}`,
     };
+  };
+
+  // Check MongoDB connection status.
+  const fetchMongoStatus = async () => {
+    try {
+      const response = await fetch(`${API_URL}/databases/mongodb/status`, {
+        headers: getAuthHeaders(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMongoStatus(data);
+      }
+    } catch {
+      // Backend status endpoint not reached
+    }
+  };
+
+  // Test MongoDB URI.
+  const testMongoConnection = async () => {
+    if (!mongoUri.trim()) {
+      setMongoFeedback({ error: true, message: "Please enter a MongoDB connection URI to test." });
+      return;
+    }
+    setTestingMongo(true);
+    setMongoFeedback(null);
+    try {
+      const response = await fetch(`${API_URL}/databases/mongodb/test`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ uri: mongoUri.trim() }),
+      });
+      const data = await response.json();
+      if (data.connected) {
+        setMongoFeedback({
+          success: true,
+          message: `Connected successfully! MongoDB Server v${data.version || "active"}`,
+        });
+      } else {
+        setMongoFeedback({
+          error: true,
+          message: data.error || "Connection failed. Please check your URI and network access.",
+        });
+      }
+    } catch (err) {
+      setMongoFeedback({ error: true, message: err.message || "Failed to reach backend." });
+    } finally {
+      setTestingMongo(false);
+    }
+  };
+
+  // Save verified MongoDB URI.
+  const saveMongoConfig = async () => {
+    if (!mongoUri.trim()) {
+      setMongoFeedback({ error: true, message: "Please enter a MongoDB connection URI." });
+      return;
+    }
+    setSavingMongo(true);
+    setMongoFeedback(null);
+    try {
+      const response = await fetch(`${API_URL}/databases/mongodb/config`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ uri: mongoUri.trim() }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to save MongoDB configuration.");
+      }
+      setMongoFeedback({
+        success: true,
+        message: "MongoDB connected and saved successfully!",
+      });
+      setMongoUri("");
+      setShowConfig(false);
+      await fetchMongoStatus();
+    } catch (err) {
+      setMongoFeedback({ error: true, message: err.message || "Failed to save configuration." });
+    } finally {
+      setSavingMongo(false);
+    }
   };
 
   // Load databases.
@@ -38,6 +132,7 @@ export default function Databases() {
 
   useEffect(() => {
     fetchDatabases();
+    fetchMongoStatus();
   }, []);
 
   // Create database.
@@ -151,11 +246,11 @@ export default function Databases() {
   return (
     <div style={{ padding: "clamp(16px, 3vw, 24px)", color: "#fff" }}>
       <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", marginBottom: "8px" }}>
-        Database Management
+        MongoDB Database Management
       </h1>
 
       <p style={{ color: "#94a3b8", marginBottom: "20px" }}>
-        Create and manage your CloudNova database records.
+        Provision and manage dedicated MongoDB databases with live cluster synchronization.
       </p>
 
       {/* Database Statistics */}
@@ -189,6 +284,173 @@ export default function Databases() {
         </div>
       </div>
 
+      {/* MongoDB Integration Card */}
+      <div style={{ ...cardStyle, marginBottom: "24px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "12px",
+          }}
+        >
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "20px" }}>🍃</span>
+              <h2 style={{ fontSize: "18px", margin: 0, fontWeight: "600" }}>
+                MongoDB Live Connection
+              </h2>
+            </div>
+            <p style={{ color: "#94a3b8", fontSize: "14px", margin: "6px 0 0 0" }}>
+              {mongoStatus?.connected
+                ? `Connected to MongoDB (${mongoStatus.uri_masked || "Active Cluster"})`
+                : mongoStatus?.configured
+                ? "MongoDB configured, but server could not be reached."
+                : "No MongoDB connection string configured yet."}
+            </p>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "6px 12px",
+                borderRadius: "20px",
+                fontSize: "13px",
+                fontWeight: "600",
+                background: mongoStatus?.connected
+                  ? "rgba(74, 222, 128, 0.15)"
+                  : "rgba(248, 113, 113, 0.15)",
+                color: mongoStatus?.connected ? "#4ade80" : "#f87171",
+                border: mongoStatus?.connected
+                  ? "1px solid rgba(74, 222, 128, 0.3)"
+                  : "1px solid rgba(248, 113, 113, 0.3)",
+              }}
+            >
+              ● {mongoStatus?.connected ? "Connected" : "Not Connected"}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowConfig(!showConfig);
+                setMongoFeedback(null);
+              }}
+              style={{
+                padding: "8px 14px",
+                background: "#334155",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontSize: "13px",
+              }}
+            >
+              {showConfig ? "Close Settings" : "Configure MongoDB"}
+            </button>
+          </div>
+        </div>
+
+        {showConfig && (
+          <div
+            style={{
+              marginTop: "16px",
+              paddingTop: "16px",
+              borderTop: "1px solid #334155",
+            }}
+          >
+            <label
+              style={{
+                display: "block",
+                fontSize: "13px",
+                color: "#cbd5e1",
+                marginBottom: "8px",
+              }}
+            >
+              MongoDB Connection URI (Atlas connection string or local MongoDB):
+            </label>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "10px",
+                marginBottom: "10px",
+              }}
+            >
+              <input
+                type="password"
+                value={mongoUri}
+                onChange={(e) => setMongoUri(e.target.value)}
+                placeholder="mongodb+srv://user:password@cluster0.xyz.mongodb.net/?retryWrites=true&w=majority"
+                style={{
+                  flex: "1 1 300px",
+                  padding: "10px 14px",
+                  background: "#0f172a",
+                  color: "#fff",
+                  border: "1px solid #334155",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                }}
+              />
+              <button
+                type="button"
+                onClick={testMongoConnection}
+                disabled={testingMongo || savingMongo}
+                style={{
+                  padding: "10px 16px",
+                  background: "#0284c7",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                {testingMongo ? "Testing..." : "Test Connection"}
+              </button>
+              <button
+                type="button"
+                onClick={saveMongoConfig}
+                disabled={testingMongo || savingMongo}
+                style={{
+                  padding: "10px 16px",
+                  background: "#16a34a",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                {savingMongo ? "Saving..." : "Save Connection"}
+              </button>
+            </div>
+            {mongoFeedback && (
+              <div
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  background: mongoFeedback.success
+                    ? "rgba(34, 197, 94, 0.15)"
+                    : "rgba(239, 68, 68, 0.15)",
+                  color: mongoFeedback.success ? "#4ade80" : "#fca5a5",
+                  border: mongoFeedback.success
+                    ? "1px solid rgba(34, 197, 94, 0.3)"
+                    : "1px solid rgba(239, 68, 68, 0.3)",
+                }}
+              >
+                {mongoFeedback.message}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Create Database Form */}
       <form
         onSubmit={createDatabase}
@@ -204,7 +466,7 @@ export default function Databases() {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Database name"
+          placeholder="MongoDB database name (e.g. app_production)"
           required
           style={{
             padding: "12px 14px",
@@ -219,26 +481,26 @@ export default function Databases() {
           }}
         />
 
-        <select
-          value={engine}
-          onChange={(e) => setEngine(e.target.value)}
+        <div
           style={{
-            padding: "12px 14px",
-            flex: "1 1 140px",
-            minWidth: "140px",
-            background: "#0f172a",
-            color: "#fff",
-            border: "1px solid #334155",
+            padding: "11px 16px",
+            background: "rgba(16, 185, 129, 0.12)",
+            border: "1px solid rgba(16, 185, 129, 0.3)",
             borderRadius: "8px",
-            fontSize: "16px",
+            color: "#4ade80",
+            fontWeight: "600",
+            fontSize: "14px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
             boxSizing: "border-box",
+            minHeight: "44px",
           }}
+          title="MongoDB is the dedicated database engine"
         >
-          <option>PostgreSQL</option>
-          <option>MySQL</option>
-          <option>MongoDB</option>
-          <option>SQLite</option>
-        </select>
+          <span>🍃</span>
+          <span>Engine: MongoDB</span>
+        </div>
 
         <button
           type="submit"
@@ -246,7 +508,7 @@ export default function Databases() {
           className="create-btn"
           style={{ minHeight: "44px" }}
         >
-          {loading ? "Creating..." : "Create Database"}
+          {loading ? "Creating..." : "Create MongoDB Database"}
         </button>
       </form>
 
@@ -263,7 +525,7 @@ export default function Databases() {
         </h2>
 
         {databases.length === 0 ? (
-          <p style={{ color: "#94a3b8" }}>No databases found. Create your first database above.</p>
+          <p style={{ color: "#94a3b8" }}>No MongoDB databases found. Create your first database above.</p>
         ) : (
           <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
             <table
@@ -276,7 +538,7 @@ export default function Databases() {
             >
               <thead>
                 <tr style={{ borderBottom: "1px solid #334155", color: "#94a3b8" }}>
-                  <th style={{ padding: "12px 10px" }}>Name</th>
+                  <th style={{ padding: "12px 10px" }}>Database Name</th>
                   <th style={{ padding: "12px 10px" }}>Engine</th>
                   <th style={{ padding: "12px 10px" }}>Status</th>
                   <th style={{ padding: "12px 10px" }}>Actions</th>
@@ -287,7 +549,7 @@ export default function Databases() {
                 {databases.map((db) => (
                   <tr key={db.id} style={{ borderBottom: "1px solid #1e293b" }}>
                     <td style={{ padding: "14px 10px", fontWeight: "600" }}>{db.name}</td>
-                    <td style={{ padding: "14px 10px", color: "#cbd5e1" }}>{db.engine}</td>
+                    <td style={{ padding: "14px 10px", color: "#4ade80", fontWeight: "600" }}>🍃 {db.engine || "MongoDB"}</td>
                     <td style={{ padding: "14px 10px" }}>
                       <span
                         style={{

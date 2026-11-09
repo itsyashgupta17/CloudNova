@@ -113,7 +113,7 @@ doc.fontSize(13).fillColor('#cbd5e1').font('Helvetica')
 
 // Feature tags box
 const tagY = 380;
-const tags = ['Compute & EC2 Engine', 'S3 Object Storage', 'Multi-Engine DBs', 'VPC Networks', 'Live Telemetry', 'FinOps Billing'];
+const tags = ['Compute & EC2 Engine', 'S3 Object Storage', 'MongoDB Database', 'VPC Networks', 'Live Telemetry', 'FinOps Billing'];
 doc.fontSize(9.5).font('Helvetica-Bold');
 let curX = 50;
 let curY = tagY;
@@ -168,7 +168,7 @@ const tocItems = [
   { num: '2', title: 'Service 1: Authentication & Identity Management (IAM)', page: '3' },
   { num: '3', title: 'Service 2: Compute & Virtual Machines (EC2 Engine)', page: '4' },
   { num: '4', title: 'Service 3: Cloud Object Storage (Buckets Service)', page: '5' },
-  { num: '5', title: 'Service 4: Multi-Engine Database Provisioning', page: '6' },
+  { num: '5', title: 'Service 4: MongoDB Database Provisioning', page: '6' },
   { num: '6', title: 'Service 5: VPC Virtual Networking & IP Routing', page: '7' },
   { num: '7', title: 'Service 6: Infrastructure Monitoring & Telemetry', page: '8' },
   { num: '8', title: 'Service 7: FinOps, Billing & Cost Estimation', page: '8' },
@@ -298,23 +298,20 @@ doc.fontSize(9).font('Courier').fillColor(NAVY)
         'DELETE /storage/buckets/{id} - Removes bucket from database');
 
 // ==========================================
-// 6. SERVICE 4: MULTI-ENGINE DATABASES
+// 6. SERVICE 4: MONGODB DATABASE
 // ==========================================
-addSectionTitle('5', 'Service 4: Multi-Engine Database Provisioning');
+addSectionTitle('5', 'Service 4: MongoDB Database Provisioning');
 
-addParagraph('CloudNova provides multi-engine database cluster management supporting relational SQL and unstructured NoSQL document architectures.');
+addParagraph('CloudNova provides dedicated MongoDB database cluster management supporting unstructured NoSQL document architectures and live cluster synchronization.');
 
-addSubTitle('Supported Database Engines');
-addBullet('PostgreSQL', 'Enterprise object-relational SQL database with strong consistency and JSONB support.');
-addBullet('MySQL', 'High-throughput relational SQL database optimized for web workloads and read scalability.');
-addBullet('MongoDB', 'Distributed document-oriented NoSQL database supporting flexible BSON/JSON schemas.');
-addBullet('SQLite', 'Lightweight serverless embedded relational engine for micro-services and testing.');
+addSubTitle('Supported Database Engine');
+addBullet('MongoDB', 'Distributed document-oriented NoSQL database supporting flexible BSON/JSON schemas and live cluster integration.');
 
 addSubTitle('Operational Lifecycle Management');
 doc.fontSize(9.5).fillColor(DARK_GRAY).font('Helvetica')
   .text('1. Open "Databases" (▣ Databases).\n' +
-        '2. Enter a Database Name (e.g. "inventory_db") and select an engine.\n' +
-        '3. Click "Create Database". The new database appears in the overview table.\n' +
+        '2. Enter a Database Name (e.g. "inventory_db") with MongoDB preset as the exclusive engine.\n' +
+        '3. Click "Create Database". The new MongoDB database appears in the overview table.\n' +
         '4. Toggle database availability: Click "Deactivate" to suspend connections, or "Activate" to restore.\n' +
         '5. Click "Delete" to permanently drop the database cluster.');
 
