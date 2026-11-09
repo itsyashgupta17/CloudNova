@@ -47,8 +47,6 @@ function App() {
 
   const [vms, setVms] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [vmName, setVmName] = useState("");
-  const [vmSize, setVmSize] = useState("2 vCPU / 4 GB");
 
   // EC2 configuration states
   const [ec2Name, setEc2Name] = useState("");
@@ -143,40 +141,6 @@ function App() {
   const runningCount = vms.filter(
     (vm) => vm.status === "Running"
   ).length;
-
-  // Create demo VM in CloudNova database.
-  async function createVM(e) {
-    e.preventDefault();
-
-    if (!vmName.trim()) return;
-
-    try {
-      const response = await fetch(`${API_URL}/vms`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: vmName.trim(),
-          size: vmSize,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("VM creation failed");
-      }
-
-      const newVM = await response.json();
-
-      setVms((current) => [...current, newVM]);
-      setVmName("");
-      setShowForm(false);
-    } catch (error) {
-      alert("Unable to create VM. Please check backend.");
-      console.error(error);
-    }
-  }
 
   // Generate safe EC2 configuration preview.
   async function previewEC2(e) {

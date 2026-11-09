@@ -4,9 +4,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ConfigurationError, ServerSelectionTimeoutError
+from dotenv import load_dotenv
 
 ENV_PATH = Path(__file__).resolve().parent / ".env"
 ROOT_ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(ENV_PATH)
+load_dotenv(ROOT_ENV_PATH)
 
 
 def _load_env_uri() -> str:

@@ -15,7 +15,7 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from jose import jwt, JWTError
 
@@ -65,7 +65,7 @@ if ENVIRONMENT == "production" and len(SECRET_KEY) < 32:
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+bearer_scheme = HTTPBearer()
 
 
 # =====================================
@@ -204,7 +204,11 @@ def create_access_token(user_id: int):
     )
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)
+):
+    token = credentials.credentials
+
     credentials_error = HTTPException(
         status_code=401,
         detail="Invalid or expired authentication token",
@@ -217,6 +221,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
+
         user_id = int(payload.get("sub"))
 
     except (JWTError, ValueError, TypeError):
@@ -531,6 +536,10 @@ def signup(user: SignupRequest):
 @app.post("/login")
 def login(credentials: LoginRequest, request: Request):
     email = credentials.email.strip().lower()
+
+
+
+    
     client_ip = request.client.host if request.client else "unknown"
 
     check_login_rate_limit(client_ip, email)
